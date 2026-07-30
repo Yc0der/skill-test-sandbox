@@ -6,5 +6,9 @@
 .husky/* text eol=lf
 *.sh text eol=lf
 
+# Collapse the lockfile in review and skip its diff — it's machine-written and huge.
 pnpm-lock.yaml -diff linguist-generated
-CHANGELOG.md -diff linguist-generated
+
+# The changelog is generated too, but its diff is the thing you actually want to
+# read in a PR, so only collapse it by default — don't suppress the diff.
+CHANGELOG.md linguist-generated

@@ -1,0 +1,10 @@
+* text=auto eol=lf
+
+# The husky hooks are shell scripts. If git rewrites them to CRLF on a Windows
+# checkout, /bin/sh fails on the trailing \r and the hook either errors or is
+# silently skipped — so force LF regardless of core.autocrlf.
+.husky/* text eol=lf
+*.sh text eol=lf
+
+pnpm-lock.yaml -diff linguist-generated
+CHANGELOG.md -diff linguist-generated

@@ -1,0 +1,44 @@
+name: Update Changelog
+
+# This workflow commits CHANGELOG.md straight back to main. That is a direct push to a
+# protected branch, so it only works if github-actions[bot] is allowed to bypass the
+# pull-request requirement — see Step 12 in SKILL.md. If that bypass is not in place,
+# this workflow will fail on every run with a protected-branch error.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    steps:
+      # Pinned to full commit SHAs, same as ci.yml; Dependabot keeps them current.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      # Full regeneration, not `--latest --prepend`. `--latest` renders only the newest
+      # tag's section and errors out when the repo has no tags — and a continuously
+      # deployed web app usually has none. Regenerating the whole file is idempotent, so
+      # the commit step below simply no-ops when nothing changed.
+      - name: Generate changelog
+        uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4.8.0
+        with:
+          config: cliff.toml
+          args: --output CHANGELOG.md
+
+      - name: Commit changelog
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          # No-op when the changelog didn't change, which also stops this workflow from
+          # re-triggering itself in a loop.
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: update changelog [skip ci]"
+          git push

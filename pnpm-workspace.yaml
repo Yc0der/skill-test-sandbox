@@ -1,0 +1,13 @@
+# pnpm 11 blocks postinstall scripts unless they are allowed here.
+# sharp — Next.js image optimization; unrs-resolver — native resolver used by
+# the ESLint import plugin in eslint-config-next. Without these set to true,
+# `pnpm install` exits with ERR_PNPM_IGNORED_BUILDS, which also fails CI.
+allowBuilds:
+  sharp: true
+  unrs-resolver: true
+
+# Shortens the directory names inside node_modules/.pnpm. On Windows, Node's
+# internal package.json reader still trips over the 260-char MAX_PATH limit, and
+# the default length (120) can push deeply nested packages past it — vitest fails
+# to start with ERR_PACKAGE_IMPORT_NOT_DEFINED. Harmless everywhere else.
+virtualStoreDirMaxLength: 40
